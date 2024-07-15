@@ -63,6 +63,10 @@
         <div class="items-center flex flex-wrap">
           <div class="w-full md:w-4/12 ml-auto mr-auto px-4">
             <form id="predictionForm">
+
+
+
+
               <div class="container max-w-full mx-auto md:py-24 px-6">
                 <div class="max-w-sm mx-auto px-6">
                   <div class="relative flex flex-wrap">
@@ -94,6 +98,9 @@
 
                           </div>
                         </form>
+
+
+
                       </div>
                     </div>
                   </div>
@@ -102,18 +109,29 @@
             </form>
           </div>
           <div class="w-full md:w-4/12 ml-auto mr-auto px-4">
-            <div>
+            <div class="pt-6">
               <h1 class="text-4xl underline underline-offset-8  ">Prediction Result</h1>
               <div class="p-4 m-2 border">
                 <div id="predictionResult"></div>
-
               </div>
             </div>
             <div class="pt-6">
-              <h1 class="text-4xl underline underline-offset-8  ">Graph Results</h1>
+              <h1 class="text-4xl underline underline-offset-8  ">Pie graph Result</h1>
               <div class="p-4 m-2 border  ">
                 <div id="graphContainer"></div>
               </div>
+            </div>
+            <div class="pt-6">
+                <h1 class="text-4xl underline underline-offset-8  ">Bar Chart Result</h1>
+                <div class="p-4 m-2 border">
+                    <div id="barChartContainer"></div>
+                </div>
+            </div>
+            <div class="pt-6">
+                <h1 class="text-4xl underline underline-offset-8  ">Word Cloud Result</h1>
+                <div class="p-4 m-2 border">
+                    <div id="wordCloudContainer"></div>
+                </div>
             </div>
             <button id="downloadBtn" style="display:none" onclick="downloadPredictions()" class="mt-3 text-lg font-semibold
             bg-gray-800 w-full text-white rounded-lg
@@ -125,6 +143,8 @@
         </div>
       </div>
     </section>
+
+
 
   </main>
   <footer class="relative bg-gray-900 pt-8 pb-6">
@@ -168,11 +188,15 @@
       })
         .then(response => {
           if (response.headers.get('X-Graph-Exists') === 'true') {
-            var graphData1 = response.headers.get('X-Graph-Data-0');
-            var graphData2 = response.headers.get('X-Graph-Data-1');
-            var graphData3 = response.headers.get('X-Graph-Data-2');
+            console.log("Graph")
+            var pieGraphData = response.headers.get('X-Graph-Data');
+            var barGraphData = response.headers.get('X-Bar-Graph-Data');
+            var wordCloudData = response.headers.get('X-Word-Cloud-Data');
 
-            displayGraph(graphData1, graphData2, graphData3);
+            displayGraph(pieGraphData);
+            displayBarChart(barGraphData)
+            displayWordCloud(wordCloudData)
+
           }
 
           return response.blob();
@@ -219,17 +243,34 @@
     console.log("Download prediction")
   }
 
-  function displayGraph(graphData1,graphData2, graphData3) {
-    var graphContainer = document.getElementById("graphContainer");
-    graphContainer.innerHTML = "";
-
-    [graphData1, graphData2, graphData3].forEach(graphData => {
-      var img = document.createElement("img");
-      img.src = "data:image/png;base64," + graphData;
-      img.style.marginBottom = "20px";
-      graphContainer.appendChild(img);
-    });
+  function displayGraph(graphData) {
+    predictionResult.innerHTML = "";
+    var graphUrl = "data:image/png;base64," + graphData;
+    var img = document.createElement('img');
+    img.src = graphUrl;
+    graphContainer.appendChild(img);
   }
+
+  function displayBarChart(barChartData){
+    barChartContainer.innerHTML = "";
+
+    var chartUrl = "data:image/png;base64," + barChartData;
+    var img = document.createElement('img');
+    img.src = chartUrl;
+    document.getElementId("barChartContainer").appendChild(img);
+  }
+
+  function displayWordCloud(wordCloudData) {
+    // Clear previous content
+    wordCloudContainer.innerHTML = "";
+
+    // Construct URL for the word cloud data
+    var cloudUrl = "data:image/png;base64," + wordCloudData;
+    var img = document.createElement('img');
+    img.src = cloudUrl;
+    document.getElementById("wordCloudContainer").appendChild(img);
+}
+
 </script>
 
 </html>
